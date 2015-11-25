@@ -7,13 +7,23 @@ extern "C"
 using namespace std;
 const int NUMBER_OF_THREADS=5;
 
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
+int val=10;
 void *thread_talk(void *thread_number)
 {
-    int a = *(static_cast<int*>(thread_number));
-    sleep(a+1);
-    cout << "Thread " << a << " has finished" << endl;
-    pthread_exit(NULL);
-return 0;
+  for(int x = 1; x<500; x++)
+  {
+      // lock the shared value here
+      pthread_mutex_lock(&mutex);
+      val*=10;
+      val++;
+      val--;
+      val/=10;
+      // unlock it for the next thread:
+      pthread_mutex_unlock(&mutex);
+  }
+  pthread_exit(NULL);
 }
 int main()
 {
